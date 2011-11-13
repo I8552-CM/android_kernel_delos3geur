@@ -2273,7 +2273,12 @@ static void layout_symtab(struct module *mod, struct load_info *info)
 	src = (void *)info->hdr + symsect->sh_offset;
 	nsrc = symsect->sh_size / sizeof(*src);
 
-	/* Compute total space required for the core symbols' strtab. */
+	/*
+	 * info->strmap has a '1' bit for each byte of .strtab we want to
+	 * keep resident in mod->core_strtab.  Everything else in .strtab
+	 * is unreferenced by the symbols in mod->core_symtab, and will be
+	 * discarded when add_kallsyms() compacts the string table.
+	 */
 	for (ndst = i = strtab_size = 1; i < nsrc; ++i, ++src)
 		if (is_core_symbol(src, info->sechdrs, info->hdr->e_shnum)) {
 			strtab_size += strlen(&info->strtab[src->st_name]) + 1;
