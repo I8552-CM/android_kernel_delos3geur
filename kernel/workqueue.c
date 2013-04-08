@@ -41,6 +41,8 @@
 #include <linux/debug_locks.h>
 #include <linux/lockdep.h>
 #include <linux/idr.h>
+#include <linux/moduleparam.h>
+
 #ifdef CONFIG_SEC_DEBUG
 #include <linux/sec_debug.h>
 #endif
