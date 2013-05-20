@@ -2093,7 +2093,6 @@ static void tcp_v6_clear_sk(struct sock *sk, int size)
 	memset(&inet->pinet6 + 1, 0, size);
 }
 
-
 struct proto tcpv6_prot = {
 	.name			= "TCPv6",
 	.owner			= THIS_MODULE,
