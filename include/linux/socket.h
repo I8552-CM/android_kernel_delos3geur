@@ -340,6 +340,9 @@ struct timespec;
 extern long __sys_recvmsg(int fd, struct msghdr __user *msg, unsigned flags);
 extern long __sys_sendmsg(int fd, struct msghdr __user *msg, unsigned flags);
 
+/* The __sys_...msg variants allow MSG_CMSG_COMPAT */
+extern long __sys_recvmsg(int fd, struct msghdr __user *msg, unsigned flags);
+extern long __sys_sendmsg(int fd, struct msghdr __user *msg, unsigned flags);
 extern int __sys_recvmmsg(int fd, struct mmsghdr __user *mmsg, unsigned int vlen,
 			  unsigned int flags, struct timespec *timeout);
 extern int __sys_sendmmsg(int fd, struct mmsghdr __user *mmsg,
