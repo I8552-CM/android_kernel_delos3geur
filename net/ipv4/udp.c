@@ -787,6 +787,7 @@ out:
 	up->pending = 0;
 	return err;
 }
+EXPORT_SYMBOL(udp_push_pending_frames);
 
 EXPORT_SYMBOL(udp_push_pending_frames);
 
