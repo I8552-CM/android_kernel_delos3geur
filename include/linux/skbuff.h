@@ -225,9 +225,6 @@ enum {
 	/* device driver is going to provide hardware time stamp */
 	SKBTX_IN_PROGRESS = 1 << 2,
 
-	/* ensure the originating sk reference is available on driver level */
-	SKBTX_DRV_NEEDS_SK_REF = 1 << 3,
-
 	/* device driver supports TX zero-copy buffers */
 	SKBTX_DEV_ZEROCOPY = 1 << 3,
 
@@ -658,7 +655,6 @@ static inline unsigned int skb_end_offset(const struct sk_buff *skb)
 {
 	return skb->end - skb->head;
 }
-
 #endif
 
 /* Internal */
@@ -1678,22 +1674,6 @@ static inline void skb_orphan(struct sk_buff *skb)
 }
 
 /**
- *	skb_orphan_frags - orphan the frags contained in a buffer
- *	@skb: buffer to orphan frags from
- *	@gfp_mask: allocation mask for replacement pages
- *
- *	For each frag in the SKB which needs a destructor (i.e. has an
- *	owner) create a copy of that frag and release the original
- *	page by calling the destructor.
- */
-static inline int skb_orphan_frags(struct sk_buff *skb, gfp_t gfp_mask)
-{
-	if (likely(!(skb_shinfo(skb)->tx_flags & SKBTX_DEV_ZEROCOPY)))
-		return 0;
-	return skb_copy_ubufs(skb, gfp_mask);
-}
-
-/**
  *	__skb_queue_purge - empty a list
  *	@list: list to empty
  *
@@ -1926,8 +1906,6 @@ static inline int __skb_cow(struct sk_buff *skb, unsigned int headroom,
 {
 	int delta = 0;
 
-	if (headroom < NET_SKB_PAD)
-		headroom = NET_SKB_PAD;
 	if (headroom > skb_headroom(skb))
 		delta = headroom - skb_headroom(skb);
 
