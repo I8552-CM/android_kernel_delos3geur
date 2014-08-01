@@ -1018,6 +1018,25 @@ static int __init msm7x27a_init_ar6000pm(void)
 static int __init msm7x27a_init_ar6000pm(void) { return 0; }
 #endif
 
+static void msm_adsp_add_pdev(void)
+{
+	int rc = 0;
+	struct rpc_board_dev *rpc_adsp_pdev;
+
+	rpc_adsp_pdev = kzalloc(sizeof(struct rpc_board_dev), GFP_KERNEL);
+	if (rpc_adsp_pdev == NULL) {
+		pr_err("%s: Memory Allocation failure\n", __func__);
+		return;
+	}
+	rpc_adsp_pdev->prog = ADSP_RPC_PROG;
+	rpc_adsp_pdev->pdev = msm_adsp_device;
+	rc = msm_rpc_add_board_dev(rpc_adsp_pdev, 1);
+	if (rc < 0) {
+		pr_err("%s: return val: %d\n",	__func__, rc);
+		kfree(rpc_adsp_pdev);
+	}
+}
+
 static void __init msm7x27a_init_regulators(void)
 {
 	int rc = platform_device_register(&msm_proccomm_regulator_dev);
