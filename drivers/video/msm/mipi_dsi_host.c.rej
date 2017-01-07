@@ -1,0 +1,31 @@
+--- len/msm/mipi_dsi_host.c	2014-12-19 10:01:02.000000000 +0000
++++ video/msm/mipi_dsi_host.c	2014-07-26 16:43:46.000000000 +0000
+@@ -1578,8 +1625,12 @@
+ 	}
+ 	spin_unlock_irqrestore(&dsi_mdp_lock, flags);
+ 
+-	if (need_wait)
+-		wait_for_completion(&dsi_mdp_comp);
++	if (need_wait) {
++		//wait_for_completion(&dsi_mdp_comp);
++		//QCOM DEBUG
++		if (wait_for_completion_timeout(&dsi_mdp_comp, HZ/10) <= 0)
++			pr_err("%s: Time Out\n", __func__);
++	}
+ }
+ 
+ /*
+@@ -1811,6 +1879,13 @@
+ 		/*
+ 		* do something  here
+ 		*/
++#if defined(CONFIG_FB_MSM_MIPI_HX8357_CMD_SMD_HVGA_PT_PANEL)
++		spin_lock(&dsi_mdp_lock);
++		pr_err("pkomandu: COMPLETE\n");
++		complete(&dsi_video_comp);
++		mipi_dsi_disable_irq_nosync(DSI_VIDEO_TERM);
++		spin_unlock(&dsi_mdp_lock);
++#endif
+ 	}
+ 
+ 	if (isr & DSI_INTR_CMD_DMA_DONE) {

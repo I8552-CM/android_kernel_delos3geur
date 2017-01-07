@@ -1,0 +1,32 @@
+--- len/msm/mipi_novatek.c	2014-12-19 10:01:02.000000000 +0000
++++ video/msm/mipi_novatek.c	2014-07-26 16:43:46.000000000 +0000
+@@ -462,6 +462,7 @@
+ 	struct mipi_panel_info *mipi;
+ 	struct platform_device *current_pdev;
+ 	static struct mipi_dsi_phy_ctrl *phy_settings;
++	static char dlane_swap;
+ 
+ 	if (pdev->id == 0) {
+ 		mipi_novatek_pdata = pdev->dev.platform_data;
+@@ -472,6 +473,11 @@
+ 		}
+ 
+ 		if (mipi_novatek_pdata
++			&& mipi_novatek_pdata->dlane_swap) {
++			dlane_swap = (mipi_novatek_pdata->dlane_swap);
++		}
++
++		if (mipi_novatek_pdata
+ 			 && mipi_novatek_pdata->fpga_3d_config_addr)
+ 			mipi_novatek_3d_init(mipi_novatek_pdata
+ 	->fpga_3d_config_addr, mipi_novatek_pdata->fpga_ctrl_mode);
+@@ -500,6 +506,9 @@
+ 
+ 		if (phy_settings != NULL)
+ 			mipi->dsi_phy_db = phy_settings;
++
++		if (dlane_swap)
++			mipi->dlane_swap = dlane_swap;
+ 	}
+ 	return 0;
+ }

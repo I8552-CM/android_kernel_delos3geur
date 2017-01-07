@@ -1,0 +1,43 @@
+--- len/msm/mdp_dma_lcdc.c	2014-12-19 10:01:02.000000000 +0000
++++ video/msm/mdp_dma_lcdc.c	2014-07-26 16:43:46.000000000 +0000
+@@ -143,7 +143,7 @@
+ 
+ 	buf += calc_fb_offset(mfd, fbi, bpp);
+ 
+-	dma2_cfg_reg = DMA_PACK_ALIGN_LSB | DMA_OUT_SEL_LCDC;
++	dma2_cfg_reg = DMA_PACK_ALIGN_LSB | DMA_DITHER_EN | DMA_OUT_SEL_LCDC;
+ 
+ 	if (mfd->fb_imgType == MDP_BGR_565)
+ 		dma2_cfg_reg |= DMA_PACK_PATTERN_BGR;
+@@ -270,8 +270,8 @@
+ 
+ 	lcdc_underflow_clr |= 0x80000000;	/* enable recovery */
+ #else
+-	hsync_polarity = 0;
+-	vsync_polarity = 0;
++	hsync_polarity = 1;
++	vsync_polarity = 1;
+ #endif
+ 	data_en_polarity = 0;
+ 
+@@ -311,7 +311,9 @@
+ 		MDP_OUTP(MDP_BASE + timer_base + 0x38, active_v_end);
+ 	}
+ 
++#if !defined(CONFIG_MACH_NEVIS3G_REV03)
+ 	ret = panel_next_on(pdev);
++#endif
+ 	if (ret == 0) {
+ 		/* enable LCDC block */
+ 		MDP_OUTP(MDP_BASE + timer_base, 1);
+@@ -335,6 +337,10 @@
+ 	}
+ 	mdp_histogram_ctrl_all(TRUE);
+ 
++#if defined(CONFIG_MACH_NEVIS3G_REV03)
++	ret = panel_next_on(pdev);
++#endif
++
+ 	return ret;
+ }
+ 

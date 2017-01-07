@@ -1,0 +1,36 @@
+--- len/msm/mdp.c	2014-12-19 10:01:02.000000000 +0000
++++ video/msm/mdp.c	2014-07-26 16:43:46.000000000 +0000
+@@ -1313,7 +1313,11 @@
+ 
+ 	INIT_COMPLETION(vsync_cntrl.vsync_wait);
+ 
+-	wait_for_completion(&vsync_cntrl.vsync_wait);
++	//wait_for_completion(&vsync_cntrl.vsync_wait);
++	//QCOM DEBUG
++	if (wait_for_completion_timeout(&vsync_cntrl.vsync_wait, HZ/10) <= 0)
++		pr_err("%s: Time Out\n", __func__);
++	
+ 	ret = snprintf(buf, PAGE_SIZE, "VSYNC=%llu",
+ 	ktime_to_ns(vsync_cntrl.vsync_time));
+ 	buf[strlen(buf) + 1] = '\0';
+@@ -1427,7 +1431,10 @@
+ 		mdp_ppp_waiting = TRUE;
+ 		spin_unlock_irqrestore(&mdp_spin_lock, flag);
+ 		outpdw(MDP_BASE + 0x30, 0x1000);
+-		wait_for_completion_killable(&mdp_ppp_comp);
++		//wait_for_completion_killable(&mdp_ppp_comp);
++		//QCOM DEBUG
++		if (wait_for_completion_timeout(&mdp_ppp_comp, HZ/10) <= 0)
++			pr_err("%s: Time Out\n", __func__);
+ 		mdp_disable_irq(term);
+ 
+ 		if (mdp_debug[MDP_PPP_BLOCK]) {
+@@ -2199,7 +2206,7 @@
+ 	return ret;
+ }
+ 
+-static int mdp_resource_initialized;
++int mdp_resource_initialized;
+ static struct msm_panel_common_pdata *mdp_pdata;
+ 
+ uint32 mdp_hw_revision;

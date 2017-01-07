@@ -1,0 +1,21 @@
+--- len/msm/msm_fb.h	2014-12-19 10:01:02.000000000 +0000
++++ video/msm/msm_fb.h	2014-07-26 16:43:46.000000000 +0000
+@@ -80,7 +80,7 @@
+ 	DISP_TARGET dest;
+ 	struct fb_info *fbi;
+ 
+-	struct device *dev;
++	struct delayed_work backlight_worker;
+ 	boolean op_enable;
+ 	uint32 fb_imgType;
+ 	boolean sw_currently_refreshing;
+@@ -218,6 +218,9 @@
+ 
+ #ifdef CONFIG_FB_MSM_LOGO
+ #define INIT_IMAGE_FILE "/initlogo.rle"
++#if defined(CONFIG_VARIANT_SECOND_BOOTIMAGE)
++#define INIT_IMAGE_VARIANT_FILE "/initlogo_swa.rle"
++#endif
+ int load_565rle_image(char *filename, bool bf_supported);
+ #endif
+ 

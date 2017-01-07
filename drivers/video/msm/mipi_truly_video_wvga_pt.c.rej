@@ -1,0 +1,10 @@
+--- len/msm/mipi_truly_video_wvga_pt.c	2014-12-19 10:01:02.000000000 +0000
++++ video/msm/mipi_truly_video_wvga_pt.c	2014-07-26 16:43:46.000000000 +0000
+@@ -92,6 +92,7 @@
+ 	pinfo.mipi.frame_rate = 60; /* FIXME */
+ 
+ 	pinfo.mipi.dsi_phy_db = &dsi_video_mode_phy_db;
++	pinfo.mipi.dlane_swap = 0x01;
+ 	pinfo.mipi.tx_eot_append = 0x01; /* append EOT at the end
+ 					    of data burst */
+ 

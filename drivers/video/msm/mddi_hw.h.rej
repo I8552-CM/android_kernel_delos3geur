@@ -1,0 +1,11 @@
+--- len/msm/mddi_hw.h	2014-12-19 10:01:02.000000000 +0000
++++ video/msm/mddi_hw.h	2014-07-26 16:43:46.000000000 +0000
+@@ -2,7 +2,7 @@
+  *
+  * MSM MDDI Hardware Registers and Structures
+  *
+- * Copyright (C) 2007 Qualcomm Technologies, Inc.
++ * Copyright (C) 2007 QUALCOMM Incorporated
+  * Copyright (C) 2007 Google Incorporated
+  *
+  * This software is licensed under the terms of the GNU General Public
