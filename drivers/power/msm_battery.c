@@ -278,11 +278,7 @@ const int temp_table[][2] = {
 
 #define TOTAL_WATING_TIME			(20 * HZ)
 #define WAKE_LOCK_TIME_OUT		(5 * HZ)
-#if defined(CONFIG_BATTERY_STC3115_DELOS)
-#define ALARM_POLLING_TIME_SHORT	(1 * 30) //30 seconds
-#else
 #define ALARM_POLLING_TIME_SHORT	(1 * 60)
-#endif
 #define ALARM_POLLING_TIME_SHORT_10	(3 * 60)
 #define ALARM_POLLING_TIME_LONG	(10 * 60)
 
@@ -329,15 +325,15 @@ const int temp_table[][2] = {
 #define BATT_TEMP_LOW_BLOCK_LPM		(-6)
 #define BATT_TEMP_LOW_RECOVER_LPM	(-1)
 #elif defined(CONFIG_MACH_ARUBA_OPEN) || defined(CONFIG_MACH_ARUBASLIM_OPEN)
-#define BATT_TEMP_HIGH_BLOCK			57
-#define BATT_TEMP_HIGH_RECOVER		39
-#define BATT_TEMP_LOW_BLOCK			(-7)
-#define BATT_TEMP_LOW_RECOVER		(0)
+#define BATT_TEMP_HIGH_BLOCK			60
+#define BATT_TEMP_HIGH_RECOVER		40
+#define BATT_TEMP_LOW_BLOCK			(-6)
+#define BATT_TEMP_LOW_RECOVER		(-1)
 
-#define BATT_TEMP_HIGH_BLOCK_LPM		57
-#define BATT_TEMP_HIGH_RECOVER_LPM	39
-#define BATT_TEMP_LOW_BLOCK_LPM		(-7)
-#define BATT_TEMP_LOW_RECOVER_LPM	(0)
+#define BATT_TEMP_HIGH_BLOCK_LPM		60
+#define BATT_TEMP_HIGH_RECOVER_LPM	40
+#define BATT_TEMP_LOW_BLOCK_LPM		(-6)
+#define BATT_TEMP_LOW_RECOVER_LPM	(-1)
 #else
 #define BATT_TEMP_HIGH_BLOCK			60
 #define BATT_TEMP_HIGH_RECOVER		40
@@ -360,7 +356,7 @@ const int temp_table[][2] = {
 #define BATT_TEMP_HIGH_RECOVER_LPM	450
 #define BATT_TEMP_LOW_BLOCK_LPM		800
 #define BATT_TEMP_LOW_RECOVER_LPM	775
-#elif defined(CONFIG_MACH_ARUBA_CTC) || defined(CONFIG_MACH_ARUBA_OPEN) || defined(CONFIG_MACH_ARUBASLIM_OPEN) \
+#elif defined(CONFIG_MACH_ARUBA_CTC) || defined(CONFIG_MACH_ARUBA_OPEN) \
 	|| defined(CONFIG_MACH_KYLEPLUS_OPEN) || defined(CONFIG_MACH_DELOS_CTC) || defined(CONFIG_MACH_HENNESSY_DUOS_CTC)
 #define BATT_TEMP_EVENT_BLOCK			719
 #define BATT_TEMP_HIGH_BLOCK			286
@@ -438,7 +434,7 @@ const int temp_table[][2] = {
 #define BATT_FULL_CHARGING_VOLTAGE	4000
 #define BATT_RECHARGING_VOLTAGE_1		4300
 #define BATT_RECHARGING_VOLTAGE_2		4150
-#define BATT_FULL_PERCENT_VOLTAGE       4250
+#define BATT_FULL_PERCENT_VOLTAGE       4275
 
 #elif defined(CONFIG_MACH_KYLEPLUS_OPEN)
 #define BATT_FULL_CHARGING_CURRENT	170
@@ -464,6 +460,10 @@ const int temp_table[][2] = {
 
 #elif defined(CONFIG_MACH_ARUBASLIM_OPEN)
 #define BATT_FULL_CHARGING_CURRENT	194		//  characteristic of FAN54013.
+#ifdef CONFIG_MSM_BACKGROUND_CHARGING_EX_CHARGER
+//It is useless, when using 2 Iterm current. (It must use with feature CONFIG_MSM_BACKGROUND_CHARGING_EX_CHARGER_TIMER)
+#define BATT_BACK_MAX_CHARGING_TIME		(60 * TIME_UNIT_MINUTE)
+#endif
 #define BATT_FULL_CHARGING_VOLTAGE	arubaslim_batt_full_charging_voltage
 #define BATT_RECHARGING_VOLTAGE_1	arubaslim_batt_recharging_voltage_1
 #define BATT_RECHARGING_VOLTAGE_2	arubaslim_batt_recharging_voltage_2
@@ -546,7 +546,7 @@ const int temp_table[][2] = {
 #if defined(CONFIG_MACH_ARUBA_DUOS_CTC) 
 #define CHG_CURR_TA		900
 #define CHG_CURR_USB		450
-#elif defined(CONFIG_MACH_ARUBA_OPEN) || defined(CONFIG_MACH_ARUBASLIM_OPEN)
+#elif defined(CONFIG_MACH_ARUBA_OPEN)
 #define CHG_CURR_TA		900
 #define CHG_CURR_USB		450
 #elif defined(CONFIG_BATTERY_STC3115) || defined(CONFIG_MACH_KYLEPLUS_CTC_OPEN)|| defined(CONFIG_MACH_KYLEPLUS_CTC)
@@ -557,7 +557,6 @@ const int temp_table[][2] = {
 #define CHG_CURR_USB		450
 #endif
 #endif /* CONFIG_CHARGER_SMB328A */
-
 
 enum {
 	BATTERY_REGISTRATION_SUCCESSFUL = 0,

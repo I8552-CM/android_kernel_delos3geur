@@ -1649,7 +1649,7 @@ void s5k4ecgx_sensor_capture_mode(struct msm_sensor_ctrl_t *s_ctrl)
 
 }
 
-#ifdef CONFIG_MACH_DELOS_OPEN
+#if defined (CONFIG_MACH_DELOS_OPEN) || defined (CONFIG_MACH_ARUBASLIM_OPEN)
 int rear_sensor_check_vendorID(int *vendorID)
 {
 	printk("rear_sensor_check_vendorID_before\n");

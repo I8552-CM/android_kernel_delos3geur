@@ -632,10 +632,11 @@ static int __init hci_uart_init(void)
 #ifdef CONFIG_BT_HCIUART_3WIRE
 	h5_init();
 #endif
+#if defined(CONFIG_MACH_DELOS_OPEN)
 #ifdef CONFIG_BT_HCIUART_IBS
 	ibs_init();
 #endif
-
+#endif
 	return 0;
 }
 
@@ -658,10 +659,11 @@ static void __exit hci_uart_exit(void)
 #ifdef CONFIG_BT_HCIUART_3WIRE
 	h5_deinit();
 #endif
+#if defined(CONFIG_MACH_DELOS_OPEN)
 #ifdef CONFIG_BT_HCIUART_IBS
 	ibs_deinit();
 #endif
-
+#endif
 
 	/* Release tty registration of line discipline */
 	err = tty_unregister_ldisc(N_HCI);

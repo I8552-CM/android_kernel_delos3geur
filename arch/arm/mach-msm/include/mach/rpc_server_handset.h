@@ -21,6 +21,9 @@ struct msm_handset_platform_data {
 };
 
 void report_headset_status(bool connected);
+#if defined(CONFIG_MACH_ARUBASLIM_OPEN)
+void report_headset_key_status(bool connected);
+#endif
 extern int current_jack_type;
 extern int current_key_state;
 #endif

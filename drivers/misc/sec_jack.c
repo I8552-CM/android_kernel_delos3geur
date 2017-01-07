@@ -43,6 +43,10 @@
 #define SUPPORT_PBA
 #define SUPPORT_CANSLEEP
 
+#ifdef CONFIG_MACH_ARUBASLIM_OPEN
+#undef FEATURE_HSSD
+#endif
+
 #ifdef CONFIG_MACH_CALLISTO
 #define SUPPORT_EARADC_CHECK
 #endif
@@ -54,6 +58,10 @@
 #ifdef SUPPORT_PBA
 #define JACK_CLASS_NAME "audio"
 #define JACK_DEV_NAME "earjack"
+
+#ifdef CONFIG_MACH_ARUBASLIM_OPEN
+extern unsigned int board_hw_revision;
+#endif
 
 static struct class *jack_class;
 EXPORT_SYMBOL(jack_class);
@@ -173,7 +181,11 @@ static void determine_jack_type(struct sec_jack_info *hi)
 {
 	if (hi->pdata->get_det_jack_state()) {
 		msleep(50);
+#if defined(CONFIG_MACH_ARUBASLIM_OPEN)
+		sec_jack_set_type(hi, hi->pdata->get_adc_value(SEC_JACK_KEY_INPUT));
+#else
 		sec_jack_set_type(hi, hi->pdata->get_adc_value());
+#endif
 	} else {
 		handle_jack_not_inserted(hi);
 	}
@@ -324,6 +336,14 @@ static irqreturn_t sec_jack_send_key_irq_thread(int irq, void *dev_id)
 	int adc;
 #endif
 
+#if defined(CONFIG_MACH_ARUBASLIM_OPEN)
+	int rc = 0;
+	if(board_hw_revision < 6){
+		pr_info("%s: rev = %d, so skipped\n", board_hw_revision);
+		return IRQ_HANDLED;
+	}
+#endif
+
 	/* debounce send/end key */
 	while (time_left_ms > 0 && !hi->send_key_pressed) {
 		send_key_state = pdata->get_send_key_state();
@@ -355,7 +375,12 @@ static irqreturn_t sec_jack_send_key_irq_thread(int irq, void *dev_id)
 
 	/* report state change of the send_end_key */
 	if (hi->send_key_pressed != send_key_state) {
+#if defined(CONFIG_MACH_ARUBASLIM_OPEN)
+		rc = hi->pdata->get_adc_value(send_key_state);
+		hi->send_key_pressed = send_key_state;
+#else
 		set_send_key_state(hi, send_key_state);
+#endif
 		pr_info(MODULE_NAME "%s : BTN is %s.\n",
 			__func__, send_key_state ? "pressed" : "released");
 	}

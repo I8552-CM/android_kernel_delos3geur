@@ -54,6 +54,9 @@
 #define HS_HEADSET_SWITCH_3_K	0xF1	/* Volume down key */
 #define HS_HEADSET_HEADPHONE_K	0xF6	/* 3pole headset key */
 #define HS_HEADSET_MICROPHONE_K 0xF7
+#if defined(CONFIG_MACH_ARUBASLIM_OPEN)
+#define HS_NONE_K		0x00 /* key press */
+#endif
 #define HS_REL_K		0xFF	/* key release */
 
 #define SW_HEADPHONE_INSERT_W_MIC 1 /* HS with mic */
@@ -105,6 +108,10 @@ enum hs_src_state {
 	HS_SRC_STATE_UNKWN = 0,
 	HS_SRC_STATE_LO,
 	HS_SRC_STATE_HI,
+#if defined(CONFIG_MACH_ARUBASLIM_OPEN)
+	HS_SRC_NONE_K,
+	HS_SRC_REL_K
+#endif
 };
 
 struct hs_event_data {
@@ -556,6 +563,52 @@ void report_headset_status(bool connected)
 		pr_err("%s: couldn't send rpc client request\n", __func__);
 }
 EXPORT_SYMBOL(report_headset_status);
+
+#if defined(CONFIG_MACH_ARUBASLIM_OPEN)
+static int hs_rpc_report_key_event_arg(struct msm_rpc_client *client,
+					void *buffer, void *data)
+{
+	struct hs_event_rpc_req {
+		uint32_t hs_event_data_ptr;
+		struct hs_event_data data;
+	};
+
+	struct hs_event_rpc_req *req = buffer;
+
+	req->hs_event_data_ptr	= cpu_to_be32(0x1);
+	req->data.ver		= cpu_to_be32(HS_EVENT_DATA_VER);
+
+	req->data.event_type = cpu_to_be32(HS_EVNT_ACCESSORY_DETECT);
+	req->data.enum_disc = cpu_to_be32(HS_EVNT_ACCESSORY_DETECT);
+
+	req->data.data_length	= cpu_to_be32(0x1);
+	req->data.data		= cpu_to_be32((*(enum hs_src_state *)data));
+	req->data.data_size	= cpu_to_be32(sizeof(enum hs_src_state));
+
+	return sizeof(*req);
+}
+
+void report_headset_key_status(bool connected)
+{
+	int rc = -1;
+	enum hs_src_state status;
+
+	pr_info("%s %d\n", __func__, connected);
+
+	if (connected == false)
+		status = HS_SRC_NONE_K;
+	else
+		status = HS_SRC_REL_K;
+
+	rc = msm_rpc_client_req(rpc_client, HS_REPORT_EVNT_PROC,
+				hs_rpc_report_key_event_arg, &status,
+				hs_rpc_report_event_res, NULL, -1);
+
+	if (rc)
+		pr_err("%s: couldn't send rpc client request\n", __func__);
+}
+EXPORT_SYMBOL(report_headset_key_status);
+#endif
 
 static int hs_rpc_pwr_cmd_arg(struct msm_rpc_client *client,
 				    void *buffer, void *data)

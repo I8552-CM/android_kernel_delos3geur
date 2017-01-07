@@ -1441,7 +1441,7 @@ static int __devexit fsa9480_remove(struct i2c_client *client)
 
 	return 0;
 }
-
+#if defined(CONFIG_MACH_DELOS_OPEN)
 extern void fsa9480_i2c_init(void);
 static void fsa9480_i2c_gpio_init(struct i2c_client *client)
 {
@@ -1451,16 +1451,16 @@ static void fsa9480_i2c_gpio_init(struct i2c_client *client)
 	fsa9480_i2c_init();
 	fsa9480_write_reg(client, FSA_REG_CTRL, FSA_RESET_VALUE);
 }
-
+#endif
 #ifdef CONFIG_PM
 static int fsa9480_resume(struct i2c_client *client)
 {
 	struct fsa9480_info *usbsw = i2c_get_clientdata(client);
 	u8 intr;
 	u8 val1, val2;
-
+#if defined(CONFIG_MACH_DELOS_OPEN)
 	fsa9480_i2c_gpio_init(client);
-
+#endif
 	/* for hibernation */
 	fsa9480_read_reg(client, FSA_REG_DEV_T1, &val1);
 	fsa9480_read_reg(client, FSA_REG_DEV_T2, &val2);

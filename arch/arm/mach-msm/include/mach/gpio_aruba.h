@@ -82,7 +82,9 @@
 #define GPIO_MICROSD_DATA_0		54
 #define GPIO_MICROSD_CMD		55
 #define GPIO_MICROSD_CLK		56
-							/* 57 */
+#if defined(CONFIG_MACH_ARUBASLIM_OPEN)
+#define GPIO_EAR_MIC_EN			57
+#endif
 #define GPIO_FM_SCL				58
 #define GPIO_SBDT_RTR6285A		59
 #define GPIO_CAM_I2C_SCL		60

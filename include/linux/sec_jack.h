@@ -17,6 +17,10 @@
 
 #ifdef __KERNEL__
 
+#if defined(CONFIG_MACH_ARUBASLIM_OPEN)
+#define SEC_JACK_KEY_INPUT 3
+#endif
+
 enum {
 	SEC_JACK_NO_DEVICE				= 0x0,
 	SEC_HEADSET_4POLE				= 0x01 << 0,
@@ -45,7 +49,11 @@ struct sec_jack_platform_data {
 	int	(*get_send_key_state) (void);
 	void	(*set_micbias_state) (bool);
 	void	(*set_micbias_state_reg5) (bool);
+#if defined(CONFIG_MACH_ARUBASLIM_OPEN)
+	int	(*get_adc_value) (int);
+#else
 	int	(*get_adc_value) (void);
+#endif
 	struct sec_jack_zone	*zones;
 	int	num_zones;
 	int	det_int;

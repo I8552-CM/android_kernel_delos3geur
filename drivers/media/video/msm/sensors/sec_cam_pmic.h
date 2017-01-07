@@ -124,7 +124,7 @@ int32_t msm_sensor_power_up_aruba_open(struct msm_sensor_ctrl_t *s_ctrl);
 int32_t msm_sensor_power_down_aruba_open(struct msm_sensor_ctrl_t *s_ctrl);
 #endif
 
-#ifdef CONFIG_MACH_DELOS_OPEN
+#if defined (CONFIG_MACH_DELOS_OPEN) || defined (CONFIG_MACH_ARUBASLIM_OPEN)
 extern int rear_sensor_check_vendorID(int *vendorID);
 #endif
 #endif
