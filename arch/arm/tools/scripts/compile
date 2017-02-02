@@ -2,7 +2,12 @@
 version=0
 make -j4 delos_defconfig
 make -j4 
+	if [ "$android" = yes ]; then
+$CROSS_COMPILE\strip --strip-unneeded `find -type f -name *.ko`
+		else
 $HOME/android_prebuilt_toolchains/arm-eabi-4.7/bin/arm-eabi-strip --strip-unneeded `find -type f -name *.ko`
+	fi
+
 mkdir system
 mkdir system/lib/
 mkdir system/lib/modules
