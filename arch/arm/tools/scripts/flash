@@ -1,9 +1,9 @@
 #!/bin/bash
-version=7
+version=0
 echo "Waiting for device"
 adb wait-for-device
 mkdir tmp 
-cp kernel-$(date +%Y%m%d)-3.5.$version-UNOFFICIAL-delos3geur.zip  tmp/
+cp kernel-$(date +%Y%m%d)-3.4.$version-UNOFFICIAL-delos3geur.zip  tmp/
 cd tmp
 unzip *.zip
 echo "PUSHING BOOT.IMG"
@@ -14,7 +14,7 @@ adb shell rm /sdcard/boot.img
 echo "installing modules"
 cd system/lib/
 adb shell mkdir /sdcard/modules
-adb push modules /sdcard/modules/
+adb push modules /sdcard/
 adb shell "su -c 'mount -o rw,remount,rw /system'"
 adb shell "su -c 'rm -rf /system/lib/modules/*.ko'"
 adb shell "su -c 'rsync -r /sdcard/modules/*.ko /system/lib/modules/'"
