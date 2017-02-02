@@ -96,5 +96,6 @@ GTAGS
 dtbToolCM
 mkbootimg
 *.img
+*.zip
 dtbtool
 \#*#

@@ -1,0 +1,17 @@
+language: c
+before_script:
+- git clone "https://github.com/ZIM555/android_prebuilts_gcc.git" "$HOME/android_prebuilt_toolchains"
+- sudo apt-get install lzop
+script:
+- export CROSS_COMPILE="$HOME/android_prebuilt_toolchains/arm-eabi-4.7/bin/arm-eabi-"
+- export ARCH=arm
+- "./build_kernel"
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: vtR6h2tUlugiqTkHTghRngDQxKbJzo5WI6oTgqoJ/o4lXeVqV6NWjV69136VNgrZPL0n5YCIof/6+TLZKCL37T1wcCMO+HjOLDyPE8m4YuGuWr+MN9uO1hq1BrSk7jDDkU1FtKnu0wP1d6ZSLR5KofyjkoIMeYz7PfaZi75BbXald178SepH268YTu6G8Pc18t5r3a/R9CbJ3CART35GsmRNAYt1ahcIvksFUsaLY0Ner8kf8XV4M8TIs76U3lkY4kR6Ra84xWl36xhgpwy/AC9KNtBJSsNpHNP1E4ej2m//rr8tMdU1GV6XUuFvTf6LA+mt+SbjLbkh3z+WxPuWLBNpALYpqBU3F4/namKk050pSf7P90k5P8ZY9PtPFVEjkFxkEiPIyodYpU0Le7Rq1J5DI+f98X+XqnxrlR8kPN1hI3T4fZsmZz8PgjwPaQksDnSNbwNUlU6hCLLehLRn5N2mk47XV2n4ERqwKkvsfJ+hMhVIEXnzNR6gstF8tSm1xwhgGlynxkwIFQR3jyrSdO9+1rwjSI5PiC9jrCxxfPp0A2lGh/hzfLnSBPef8VdakUx3U0uKJeZIVm6eg3HuF2xGKCM3aAl1PJCSCsjgSSAlyqaNujLvDnEjhuZcfpD2QgdBL8umneKrtDRKUlgBrSX6lu1fo7XkyoFfvfE7+OU=
+  file: "./kernel-$(date +%Y%m%d)-3.4.0-UNOFFICIAL-delos3geur.zip"
+  on:
+    repo: I8552-CM/android_kernel_delos3geur
+    branch: cm-13.0
