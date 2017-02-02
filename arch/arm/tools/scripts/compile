@@ -18,5 +18,5 @@ gcc -o mkbootimg libmincrypt/*.c mkbootimg.c -Iinclude
 cp scripts/updater-script META-INF/com/google/android/updater-script
 zip -r tmp META-INF boot.img system 
 rm META-INF/com/google/android/updater-script
-rm -rf system boot.img zImage mkbootimg boot.img-ramdisk.gz
+rm -rf system boot.img zImage mkbootimg
 mv -f tmp.zip ../../../kernel-$(date +%Y%m%d)-3.4.$version-UNOFFICIAL-delos3geur.zip 
