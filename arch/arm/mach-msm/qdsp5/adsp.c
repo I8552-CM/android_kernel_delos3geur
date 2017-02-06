@@ -37,6 +37,7 @@
 #include <linux/workqueue.h>
 #include <mach/debug_mm.h>
 #include <linux/debugfs.h>
+#include <linux/android_pmem.h>
 
 #ifdef CONFIG_DEBUG_FS
 static struct dentry *dentry_adsp;
