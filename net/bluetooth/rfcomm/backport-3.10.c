@@ -18,7 +18,7 @@
 #include <linux/pci_regs.h>
 #include <linux/of.h>
 #include <linux/mm.h>
-
+#include <linux/uidgid.h>
 void proc_set_size(struct proc_dir_entry *de, loff_t size)
 {
 	de->size = size;

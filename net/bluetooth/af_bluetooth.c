@@ -30,7 +30,7 @@
 
 #include <net/bluetooth/bluetooth.h>
 #include <linux/proc_fs.h>
-
+#include <linux/uidgid.h>
 #define VERSION "2.19"
 
 /* Bluetooth sockets */
