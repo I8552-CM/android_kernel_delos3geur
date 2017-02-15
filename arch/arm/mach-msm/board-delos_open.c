@@ -21,6 +21,7 @@
 #include <linux/mtd/partitions.h>
 #include <linux/i2c.h>
 #include <linux/msm_ion.h>
+#include <linux/android_pmem.h>
 #include <linux/bootmem.h>
 #include <linux/mfd/marimba.h>
 #include <linux/power_supply.h>
@@ -133,7 +134,7 @@ extern unsigned int board_hw_revision;
 #define WLAN_33V_BT_FLAG (0x02)
 
 int wlan_33v_flag;
-
+static u64 msm_dmamask = DMA_BIT_MASK(32);
 int wlan_setup_ldo_33v(int input_flag, int on);
 #endif
 
@@ -1430,11 +1431,11 @@ static struct platform_device msm8625q_i2c_gpio = {
 
 #ifdef CONFIG_ARCH_MSM7X27A
 #define MSM_RESERVE_MDP_SIZE       0x2300000
-#define MSM_RESERVE_ADSP_SIZE      0x1200000
+#define MSM_PMEM_ADSP_SIZE      0x1200000
 #define CAMERA_ZSL_SIZE		(SZ_1M * 60)
 
 #define MSM_ION_AUDIO_SIZE	(MSM_RESERVE_AUDIO_SIZE + RESERVE_KERNEL_EBI1_SIZE)
-#define MSM_ION_CAMERA_SIZE	MSM_RESERVE_ADSP_SIZE
+#define MSM_ION_CAMERA_SIZE	MSM_PMEM_ADSP_SIZE
 #define MSM_ION_SF_SIZE		MSM_RESERVE_MDP_SIZE
 #define MSM_ION_HEAP_NUM	5
 #ifdef CONFIG_ION_MSM
@@ -2007,6 +2008,32 @@ static struct msm_pm_boot_platform_data msm_pm_8625_boot_pdata __initdata = {
 	.v_addr = MSM_CFG_CTL_BASE,
 };
 
+#ifdef CONFIG_ANDROID_PMEM
+static struct platform_device pmem_adsp_heap_device = {
+	.name = "pmem-adsp-heap-device",
+	.id = -1,
+	.dev = {
+		.dma_mask = &msm_dmamask,
+		.coherent_dma_mask = DMA_BIT_MASK(32),
+	}
+};
+#endif
+
+static struct android_pmem_platform_data android_pmem_adsp_pdata = {
+	.name = "pmem_adsp",
+	.allocator_type = PMEM_ALLOCATORTYPE_BITMAP,
+	.cached = 0,
+	.memory_type = MEMTYPE_EBI0,
+	.use_cma = 1,
+	.private_data = &pmem_adsp_heap_device.dev,
+};
+
+static struct platform_device android_pmem_adsp_device = {
+	.name = "android_pmem",
+	.id = 0,
+	.dev = { .platform_data = &android_pmem_adsp_pdata },
+};
+
 static unsigned reserve_mdp_size = MSM_RESERVE_MDP_SIZE;
 static int __init reserve_mdp_size_setup(char *p)
 {
@@ -2016,14 +2043,13 @@ static int __init reserve_mdp_size_setup(char *p)
 
 early_param("reserve_mdp_size", reserve_mdp_size_setup);
 
-static unsigned reserve_adsp_size = MSM_RESERVE_ADSP_SIZE;
-static int __init reserve_adsp_size_setup(char *p)
+static unsigned pmem_adsp_size = MSM_PMEM_ADSP_SIZE;
+static int __init pmem_adsp_size_setup(char *p)
 {
-	reserve_adsp_size = memparse(p, NULL);
+	pmem_adsp_size = memparse(p, NULL);
 	return 0;
 }
-
-early_param("reserve_adsp_size", reserve_adsp_size_setup);
+early_param("pmem_adsp_size", pmem_adsp_size_setup);
 
 static char *msm_adc_surf_device_names[] = {
 	"XO_ADC",
@@ -2223,6 +2249,13 @@ static struct platform_device *common_devices[] __initdata = {
 #ifdef CONFIG_ION_MSM
 	&ion_dev,
 #endif
+#ifdef CONFIG_ANDROID_PMEM
+	&android_pmem_adsp_device,
+#endif
+#ifdef CONFIG_ANDROID_RAM_CONSOLE
+	&ram_console_device,
+#endif
+
 };
 
 static struct platform_device *qrd7627a_devices[] __initdata = {
@@ -2312,7 +2345,7 @@ early_param("reserve_audio_size", reserve_audio_size_setup);
 static void fix_sizes(void)
 {
 	if (get_ddr_size() > SZ_512M)
-		reserve_adsp_size = CAMERA_ZSL_SIZE;
+		pmem_adsp_size = CAMERA_ZSL_SIZE;
 	else {
 		if  (machine_is_msm8625q_evbd()
 					|| machine_is_msm8625q_skud())
@@ -2323,18 +2356,16 @@ static void fix_sizes(void)
 	msm_ion_sf_size = reserve_mdp_size;
 #ifdef CONFIG_CMA
 	if (get_ddr_size() > SZ_256M)
-                reserve_adsp_size = CAMERA_ZSL_SIZE;
-	msm_ion_camera_size = reserve_adsp_size;
+                pmem_adsp_size = CAMERA_ZSL_SIZE;
+	msm_ion_camera_size = pmem_adsp_size;
         msm_ion_camera_size_carving = 0;
 #else
-	msm_ion_camera_size = reserve_adsp_size;
+	msm_ion_camera_size = pmem_adsp_size;
         msm_ion_camera_size_carving = msm_ion_camera_size;
 #endif
 #endif
 }
 
-#ifdef CONFIG_ION_MSM
-#ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
 static struct ion_co_heap_pdata co_ion_pdata = {
 	.adjacent_mem_id = INVALID_HEAP_ID,
 	.align = PAGE_SIZE,
@@ -2345,8 +2376,6 @@ static struct ion_co_heap_pdata co_mm_ion_pdata = {
 	.align = PAGE_SIZE,
 };
 
-static u64 msm_dmamask = DMA_BIT_MASK(32);
-
 static struct platform_device ion_cma_device = {
 	.name = "ion-cma-device",
 	.id = -1,
@@ -2355,7 +2384,6 @@ static struct platform_device ion_cma_device = {
 		.coherent_dma_mask = DMA_BIT_MASK(32),
 	}
 };
-#endif
 
 /**
  * These heaps are listed in the order they will be allocated.
@@ -2367,7 +2395,6 @@ struct ion_platform_heap msm7627a_heaps[] = {
 			.type	= ION_HEAP_TYPE_SYSTEM,
 			.name	= ION_VMALLOC_HEAP_NAME,
 		},
-#ifdef CONFIG_MSM_MULTIMEDIA_USE_ION
 		/* ION_ADSP = CAMERA */
 		{
 			.id	= ION_CAMERA_HEAP_ID,
@@ -2402,7 +2429,7 @@ struct ion_platform_heap msm7627a_heaps[] = {
 			.extra_data = (void *)&co_ion_pdata,
 			.base = BOOTLOADER_BASE_ADDR,
 		},
-#endif
+
 };
 
 static struct ion_platform_data ion_pdata = {
@@ -2416,7 +2443,7 @@ static struct platform_device ion_dev = {
 	.id = 1,
 	.dev = { .platform_data = &ion_pdata },
 };
-#endif
+
 
 static struct memtype_reserve msm7627a_reserve_table[] __initdata = {
 	[MEMTYPE_SMI] = {
@@ -2429,6 +2456,21 @@ static struct memtype_reserve msm7627a_reserve_table[] __initdata = {
 	},
 };
 
+static void __init size_pmem_devices(void)
+{
+#ifdef CONFIG_ANDROID_PMEM
+
+	android_pmem_adsp_pdata.size = pmem_adsp_size;
+#endif
+}
+static void __init reserve_pmem_memory(void)
+{
+#ifdef CONFIG_ANDROID_PMEM
+	//unsigned int i;
+
+	msm7627a_reserve_table[MEMTYPE_EBI1].size += android_pmem_adsp_pdata.size;
+#endif
+}
 
 static void __init size_ion_devices(void)
 {
@@ -2452,6 +2494,8 @@ static void __init reserve_ion_memory(void)
 
 static void __init msm7627a_calculate_reserve_sizes(void)
 {
+	size_pmem_devices();
+	reserve_pmem_memory();
 	fix_sizes();
 	size_ion_devices();
 	reserve_ion_memory();
@@ -2474,6 +2518,16 @@ static void __init msm7627a_reserve(void)
 	memblock_remove(MSM8625_NON_CACHE_MEM, SZ_2K);
 	memblock_remove(BOOTLOADER_BASE_ADDR, msm_ion_audio_size);
 	msm_reserve();
+#ifdef CONFIG_ANDROID_PMEM
+	dma_declare_contiguous(
+			&pmem_adsp_heap_device.dev,
+			pmem_adsp_size,
+			0x0,
+			0x20000000);
+#endif
+#ifdef CONFIG_ANDROID_PERSISTENT_RAM
+	add_persistent_ram();
+#endif
 #ifdef CONFIG_CMA
 	dma_declare_contiguous(
 			&ion_cma_device.dev,
