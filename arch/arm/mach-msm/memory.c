@@ -41,7 +41,7 @@
 /* fixme */
 #include <asm/tlbflush.h>
 #include <../../mm/mm.h>
-
+#include <linux/android_pmem.h>
 #if defined(CONFIG_ARCH_MSM7X27)
 static void *strongly_ordered_page;
 static char strongly_ordered_mem[PAGE_SIZE*2-4];

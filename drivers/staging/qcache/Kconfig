@@ -3,6 +3,6 @@ config QCACHE
 	depends on CLEANCACHE
 	select LZO_COMPRESS
 	select LZO_DECOMPRESS
-	default n
+	default y
 	help
 	  Qcache is the backend for fmem
