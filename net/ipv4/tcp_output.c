@@ -1079,6 +1079,7 @@ static void tcp_set_skb_tso_segs(const struct sock *sk, struct sk_buff *skb,
 {
 	/* Make sure we own this skb before messing gso_size/gso_segs */
 	WARN_ON_ONCE(skb_cloned(skb));
+
 	if (skb->len <= mss_now || !sk_can_gso(sk) ||
 	    skb->ip_summed == CHECKSUM_NONE) {
 		/* Avoid the costly divide in the normal
@@ -1943,7 +1944,7 @@ static int tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,
 		limit = mss_now;
 		if (tso_segs > 1 && !tcp_urg_mode(tp))
 			limit = tcp_mss_split_point(sk, skb, mss_now,
-					    min_t(unsigned int,
+						    min_t(unsigned int,
 							  cwnd_quota,
 							  sk->sk_gso_max_segs));
 
@@ -2344,7 +2345,6 @@ int tcp_retransmit_skb(struct sock *sk, struct sk_buff *skb)
 		/* Save stamp of the first retransmit. */
 		if (!tp->retrans_stamp)
 			tp->retrans_stamp = TCP_SKB_CB(skb)->when;
-
 
 		/* snd_nxt is stored to detect loss of retransmitted segment,
 		 * see tcp_input.c tcp_sacktag_write_queue().
