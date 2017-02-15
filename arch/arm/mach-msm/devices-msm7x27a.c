@@ -213,7 +213,7 @@ static struct persistent_ram_descriptor pram_descs[] = {
 #endif
 };
 
-static struct persistent_ram msm7x30_persistent_ram = {
+static struct persistent_ram msm7672a_persistent_ram = {
 	.start = PERSISTENT_RAM_BASE,
 	.size = PERSISTENT_RAM_SIZE,
 	.num_descs = ARRAY_SIZE(pram_descs),
@@ -222,7 +222,7 @@ static struct persistent_ram msm7x30_persistent_ram = {
 
 void __init add_persistent_ram(void)
 {
-	persistent_ram_early_init(&msm7x30_persistent_ram);
+	persistent_ram_early_init(&msm7672a_persistent_ram);
 }
 #endif
 
