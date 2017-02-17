@@ -1431,7 +1431,7 @@ static struct platform_device msm8625q_i2c_gpio = {
 
 #ifdef CONFIG_ARCH_MSM7X27A
 #define MSM_RESERVE_MDP_SIZE       0x2300000
-#define MSM_PMEM_ADSP_SIZE      0x1200000
+#define MSM_PMEM_ADSP_SIZE      0x1A00000
 #define CAMERA_ZSL_SIZE		(SZ_1M * 60)
 
 #define MSM_ION_AUDIO_SIZE	(MSM_RESERVE_AUDIO_SIZE + RESERVE_KERNEL_EBI1_SIZE)
