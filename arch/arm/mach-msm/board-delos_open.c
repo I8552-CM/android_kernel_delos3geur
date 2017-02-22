@@ -2021,11 +2021,8 @@ static struct platform_device pmem_adsp_heap_device = {
 
 static struct android_pmem_platform_data android_pmem_adsp_pdata = {
 	.name = "pmem_adsp",
-	.allocator_type = PMEM_ALLOCATORTYPE_BITMAP,
-	.cached = 0,
-	.memory_type = MEMTYPE_EBI0,
-	.use_cma = 1,
-	.private_data = &pmem_adsp_heap_device.dev,
+	.ion_heap_id = ION_CP_MM_HEAP_ID,
+
 };
 
 static struct platform_device android_pmem_adsp_device = {
