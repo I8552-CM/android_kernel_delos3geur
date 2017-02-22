@@ -20,7 +20,7 @@
    SOFTWARE IS DISCLAIMED.
 */
 
-#include <linux/export.h>
+#include <linux/module.h>
 #include <linux/proc_fs.h>
 #include <linux/seq_file.h>
 #include <linux/types.h>
@@ -362,6 +362,12 @@ void cmtp_recv_capimsg(struct cmtp_session *session, struct sk_buff *skb)
 		CAPIMSG_SETCONTROL(skb->data, contr);
 	}
 
+	if (!ctrl) {
+		BT_ERR("Can't find controller %d for message", session->num);
+		kfree_skb(skb);
+		return;
+	}
+
 	capi_ctr_handle_message(ctrl, appl, skb);
 }
 
@@ -380,8 +386,7 @@ static void cmtp_reset_ctr(struct capi_ctr *ctrl)
 
 	capi_ctr_down(ctrl);
 
-	atomic_inc(&session->terminate);
-	wake_up_process(session->task);
+	kthread_stop(session->task);
 }
 
 static void cmtp_register_appl(struct capi_ctr *ctrl, __u16 appl, capi_register_params *rp)
@@ -533,7 +538,7 @@ static int cmtp_proc_show(struct seq_file *m, void *v)
 
 static int cmtp_proc_open(struct inode *inode, struct file *file)
 {
-	return single_open(file, cmtp_proc_show, PDE_DATA(inode));
+	return single_open(file, cmtp_proc_show, PDE(inode)->data);
 }
 
 static const struct file_operations cmtp_proc_fops = {

@@ -471,8 +471,8 @@ static int pmem_mmap(struct file *file, struct vm_area_struct *vma)
 	/* Set vma for future mappings. */
 	adata->vma = vma;
 
-	pr_debug("%s: Allocated & mmapped p:0x%llx v:0x%lx\n",
-		__func__, (u64)adata->addr, vma->vm_start);
+	pr_debug("%s: Allocated & mmapped p:0x%lx v:0x%lx\n",
+		__func__, adata->addr, vma->vm_start);
 
 	return 0;
 err_free:
@@ -533,7 +533,7 @@ int pmem_setup(struct android_pmem_platform_data *pdata,
 		goto err;
 	}
 	pmem[id].heap_id = pdata->ion_heap_id;
-	pmem[id].client = msm_ion_client_create(-1,pdata->name);
+	pmem[id].client = msm_ion_client_create(-1, pdata->name);
 	if (IS_ERR_OR_NULL(pmem[id].client)) {
 		ret = PTR_ERR(pmem[id].client);
 		pmem[id].client = NULL;
